@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tic Tac Toe</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
+        <div class="container">
+            <div id="board"></div>
+
+            <div class="field">
+                <label for="starting">Starting Player</label>
+                <select id="starting">
+                    <option value="1">Human</option>
+                    <option value="0">Computer</option>
+                </select>
+            </div>
+            
+            <div class="field">
+                <label for="depth">Depth (Difficulty)</label>
+                <select id="depth">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option selected="selected" value="-1">Unlimited</option>
+                </select>
+            </div>
+            
+            <button id="newGame">New Game</button>
+        </div>
+
+        <script type="module" src="script.js"></script>
+
+    </body>
+</html>
