@@ -40,7 +40,7 @@ body {
     cursor: pointer;
     color: #fff;
     font-size: calc(18px + 5vw);
-    font-family: fantasy;
+    font-family: serif;
 }
 
 #board [class^="cell-"].x, #board [class^="cell-"].o {
