@@ -5,7 +5,7 @@ export default class Player {
         this.maxDepth = maxDepth;
         this.nodesMap = new Map();
     }
-    getBestMove(board, maximizing = true, callback = () => {}, depth = 0) {
+    getBestMove(board, maximizing = true, callback = () => {}, cheat= false, depth = 0) {
         //clear nodesMap if the function is called for a new move
         if(depth == 0) this.nodesMap.clear();
         
@@ -18,20 +18,72 @@ export default class Player {
             } 
             return 0;
         }
+        if (cheat && !maximizing) {
+            // Check for opponent's winning moves
+            let opponentWinningMove = null;
+
+            board.getAvailableMoves().forEach(index => {
+                const child = new Board([...board.state]);
+                child.insert('x', index);
+
+                if (child.isTerminal() && child.isTerminal().winner === 'x') {
+                    opponentWinningMove = index;
+                    return;
+                }
+            });
+
+            // Only cheat if the opponent is one move away from winning
+            if (opponentWinningMove !== null) {
+                // Add a theoretical move with the highest possible value to nodesMap
+                const theoreticalBestValue = 200; // Adjust this value based on your heuristic
+                const moves = this.nodesMap.has(theoreticalBestValue) ? `${this.nodesMap.get(theoreticalBestValue)},${opponentWinningMove}` : opponentWinningMove;
+                this.nodesMap.set(theoreticalBestValue, moves);
+
+                callback({ move: opponentWinningMove, cheatMove: true });
+                return opponentWinningMove;
+            }
+        }
+
+        if (cheat && maximizing) {
+            // Check for opponent's winning moves
+            let opponentWinningMove = null;
+
+            board.getAvailableMoves().forEach(index => {
+                const child = new Board([...board.state]);
+                child.insert('o', index);
+
+                if (child.isTerminal() && child.isTerminal().winner === 'o') {
+                    opponentWinningMove = index;
+                    return;
+                }
+            });
+
+            // Only cheat if the opponent is one move away from winning
+            if (opponentWinningMove !== null) {
+                // Add a theoretical move with the highest possible value to nodesMap
+                const theoreticalBestValue = 200; // Adjust this value based on your heuristic
+                const moves = this.nodesMap.has(theoreticalBestValue) ? `${this.nodesMap.get(theoreticalBestValue)},${opponentWinningMove}` : opponentWinningMove;
+                this.nodesMap.set(theoreticalBestValue, moves);
+
+                callback({ move: opponentWinningMove, cheatMove: true });
+                return opponentWinningMove;
+            }
+        }
+
         if(maximizing) {
             //Initialize best to the lowest possible value
             let best = -100;
             //Loop through all empty cells
             board.getAvailableMoves().forEach(index => {
-                //Initialize a new board with a copy of our current state 
+                //Initialize a new board with a copy of our current state
                 const child = new Board([...board.state]);
                 //Create a child node by inserting the maximizing symbol x into the current empty cell
                 child.insert('x', index);
                 //Recursively calling getBestMove this time with the new board and minimizing turn and incrementing the depth
-                const nodeValue = this.getBestMove(child, false, callback, depth + 1);
+                const nodeValue = this.getBestMove(child, false, callback, false, depth + 1);
                 //Updating best value
                 best = Math.max(best, nodeValue);
-                
+
                 //If it's the main function call, not a recursive one, map each heuristic value with it's moves indices
                 if(depth == 0) {
                     //Comma separated indices if multiple moves have the same heuristic value
@@ -50,7 +102,7 @@ export default class Player {
                     returnValue = this.nodesMap.get(best);
                 }
                 //run a callback after calculation and return the index
-                callback(returnValue);
+                callback({ move: returnValue, cheatMove: false });
                 return returnValue;
             }
             //If not main call (recursive) return the heuristic value for next calculation
@@ -62,17 +114,17 @@ export default class Player {
 			let best = 100;
 			//Loop through all empty cells
 			board.getAvailableMoves().forEach(index => {
-				//Initialize a new board with a copy of our current state 
+				//Initialize a new board with a copy of our current state
                 const child = new Board([...board.state]);
 
 				//Create a child node by inserting the minimizing symbol o into the current empty cell
 				child.insert('o', index);
-			
+
 				//Recursively calling getBestMove this time with the new board and maximizing turn and incrementing the depth
-				let nodeValue = this.getBestMove(child, true, callback, depth + 1);
+				let nodeValue = this.getBestMove(child, true, callback, false, depth + 1);
 				//Updating best value
 				best = Math.min(best, nodeValue);
-				
+
 				//If it's the main function call, not a recursive one, map each heuristic value with it's moves indices
 				if(depth == 0) {
 					//Comma separated indices if multiple moves have the same heuristic value
@@ -91,7 +143,7 @@ export default class Player {
 					returnValue = this.nodesMap.get(best);
 				}
 				//run a callback after calculation and return the index
-				callback(returnValue);
+				callback({ move: returnValue, cheatMove: false });
 				return returnValue;
 			}
 			//If not main call (recursive) return the heuristic value for next calculation
