@@ -54,14 +54,15 @@ function newGame(depth = -1, startingPlayer = 1) {
             playerTurn = 0; //Switch turns
             //Get computer's best move and update the UI
             player.getBestMove(board, !maximizing, best => {
-                let symbol = best.cheatMove ? (!maximizing ? 'o' : 'x') : (!maximizing ? 'x' : 'o');
-                board.insert(symbol, parseInt(best.move));
-                addClass(htmlCells[best.move], symbol);
-                if(board.isTerminal()) {
-                    drawWinningLine(board.isTerminal());
-                }
-                playerTurn = 1; //Switch turns
-            }, true); // TODO: implement var for cheat functionality based on test scenerio
+                setTimeout(() => {
+                    let symbol = best.cheatMove ? (!maximizing ? 'o' : 'x') : (!maximizing ? 'x' : 'o');
+                    board.insert(symbol, parseInt(best.move));
+                    addClass(htmlCells[best.move], symbol);
+                    if(board.isTerminal()) {
+                        drawWinningLine(board.isTerminal());
+                    }
+                    playerTurn = 1; //Switch turns
+                }, 1500);}, true);
         }, false);
         if(cell) addClass(htmlCells[index], cell);
     });
