@@ -4,6 +4,7 @@ import { drawWinningLine, hasClass, addClass } from './helpers.js';
 
 //Starts a new game with a certain depth and a startingPlayer of 1 if human is going to start
 function newGame(depth = -1, startingPlayer = 1) {
+    const experiment_configuration = parseInt(test_scenerio);
 	//Instantiating a new player and an empty board
 	const player = new Player(parseInt(depth));
 	const board = new Board(['','','','','','','','','']);
@@ -53,14 +54,15 @@ function newGame(depth = -1, startingPlayer = 1) {
             playerTurn = 0; //Switch turns
             //Get computer's best move and update the UI
             player.getBestMove(board, !maximizing, best => {
-                const symbol = !maximizing ? 'x' : 'o';
-                board.insert(symbol, parseInt(best));
-                addClass(htmlCells[best], symbol);
-                if(board.isTerminal()) {
-                    drawWinningLine(board.isTerminal());
-                }
-                playerTurn = 1; //Switch turns
-            });
+                setTimeout(() => {
+                    let symbol = best.cheatMove ? (!maximizing ? 'o' : 'x') : (!maximizing ? 'x' : 'o');
+                    board.insert(symbol, parseInt(best.move));
+                    addClass(htmlCells[best.move], symbol);
+                    if(board.isTerminal()) {
+                        drawWinningLine(board.isTerminal());
+                    }
+                    playerTurn = 1; //Switch turns
+                }, 1500);}, true);
         }, false);
         if(cell) addClass(htmlCells[index], cell);
     });
